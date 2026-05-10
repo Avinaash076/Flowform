@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowForm - Animations & Effects Showcase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link rel="stylesheet" href="assets/css/visual-effects.css">
+    <style>
+        body {
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .showcase-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .showcase-header h1 {
+            font-size: 3rem;
+            margin: 0 0 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pageFadeIn 0.6s ease-out;
+        }
+        .showcase-section {
+            margin-bottom: 60px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1565C0;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .demo-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .demo-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        .demo-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .animation-box {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 700;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-container">
+        <!-- Header -->
+        <div class="showcase-header">
+            <h1>✨ FlowForm Animations & Effects</h1>
+            <p style="font-size: 1.1rem; color: #666;">A complete showcase of professional animations and visual effects</p>
+        </div>
+
+        <!-- Page Animations -->
+        <div class="showcase-section">
+            <h2 class="section-title">📄 Page Entrance Animations</h2>
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-label">Fade In</div>
+                    <div class="animation-box gradient-primary fade-enter">FADE IN</div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Slide Up</div>
+                    <div class="animation-box gradient-cool slide-up-enter">SLIDE UP</div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Scale In</div>
+                    <div class="animation-box gradient-warm scale-enter">SCALE IN</div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Bounce In</div>
+                    <div class="animation-box gradient-ocean bounce-enter">BOUNCE IN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Animations -->
+        <div class="showcase-section">
+            <h2 class="section-title">🎴 Card Animations</h2>
+            <div class="demo-grid">
+                <div class="panel-card hover-shadow-lift">
+                    <h3 style="margin-top: 0;">Hover Lift</h3>
+                    <p>Smooth card elevation on hover with shadow effect</p>
+                </div>
+                <div class="panel-card hover-shadow-pop">
+                    <h3 style="margin-top: 0;">Pop Effect</h3>
+                    <p>Card scales up slightly with enhanced shadow</p>
+                </div>
+                <div class="panel-card glass-effect">
+                    <h3 style="margin-top: 0;">Glass Effect</h3>
+                    <p>Modern glassmorphism with blur backdrop</p>
+                </div>
+                <div class="panel-card border-gradient">
+                    <h3 style="margin-top: 0;">Gradient Border</h3>
+                    <p>Beautiful gradient border effect</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gradient Effects -->
+        <div class="showcase-section">
+            <h2 class="section-title">🎨 Gradient Effects</h2>
+            <div class="demo-grid">
+                <div class="animation-box gradient-primary">Primary</div>
+                <div class="animation-box gradient-success">Success</div>
+                <div class="animation-box gradient-warning">Warning</div>
+                <div class="animation-box gradient-danger">Danger</div>
+                <div class="animation-box gradient-smooth">Smooth</div>
+                <div class="animation-box gradient-cool">Cool</div>
+                <div class="animation-box gradient-warm">Warm</div>
+                <div class="animation-box gradient-ocean">Ocean</div>
+            </div>
+        </div>
+
+        <!-- Animated Gradients -->
+        <div class="showcase-section">
+            <h2 class="section-title">🌈 Animated Gradients</h2>
+            <div class="demo-grid">
+                <div class="animation-box gradient-animated" style="background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);">
+                    Smooth Shift
+                </div>
+                <div class="animation-box gradient-animated-fast" style="background: linear-gradient(-45deg, #fa709a, #fee140, #30ff62, #a8edea);">
+                    Fast Shift
+                </div>
+            </div>
+        </div>
+
+        <!-- Button Animations -->
+        <div class="showcase-section">
+            <h2 class="section-title">🔘 Button Animations</h2>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; padding: 20px; background: white; border-radius: 12px;">
+                <button class="btn-primary">Primary Button</button>
+                <button class="btn-primary button-pulse">Pulsing Button</button>
+                <button class="btn-secondary">Secondary Button</button>
+                <button class="btn-ghost">Ghost Button</button>
+                <button class="btn-mini">Mini Button</button>
+            </div>
+        </div>
+
+        <!-- Loading States -->
+        <div class="showcase-section">
+            <h2 class="section-title">⚙️ Loading Animations</h2>
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-label">Spinner</div>
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <div class="spinner spinner-medium spinner-primary"></div>
+                    </div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Pulse</div>
+                    <div class="animation-box gradient-primary pulse-animate">LOADING</div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Bounce</div>
+                    <div class="animation-box gradient-cool bounce-animate">LOADING</div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Skeleton</div>
+                    <div class="skeleton" style="height: 60px; border-radius: 8px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Effects -->
+        <div class="showcase-section">
+            <h2 class="section-title">📝 Text Effects</h2>
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-label">Gradient Text</div>
+                    <h2 class="text-gradient" style="margin: 0; font-size: 1.5rem;">Gradient Text</h2>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Gradient Success</div>
+                    <h2 class="text-gradient-success" style="margin: 0; font-size: 1.5rem;">Success Text</h2>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Neon Glow</div>
+                    <h2 class="neon-glow" style="margin: 0; font-size: 1.5rem; color: #1565C0;">Neon Glow</h2>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-label">Shimmer</div>
+                    <h2 class="text-shimmer" style="margin: 0; font-size: 1.5rem;">Shimmer Text</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shadow Effects -->
+        <div class="showcase-section">
+            <h2 class="section-title">🌑 Shadow Effects</h2>
+            <div class="demo-grid">
+                <div class="demo-item shadow-soft">
+                    <p style="margin: 0;">Soft Shadow</p>
+                </div>
+                <div class="demo-item shadow-medium">
+                    <p style="margin: 0;">Medium Shadow</p>
+                </div>
+                <div class="demo-item shadow-hard">
+                    <p style="margin: 0;">Hard Shadow</p>
+                </div>
+                <div class="demo-item shadow-floating">
+                    <p style="margin: 0;">Floating Shadow</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Glass Effects -->
+        <div class="showcase-section">
+            <h2 class="section-title">🔷 Glass & Blur Effects</h2>
+            <div class="demo-grid">
+                <div class="demo-item glass-effect">
+                    <p style="margin: 0;">Glass Effect</p>
+                </div>
+                <div class="demo-item glass-effect-strong">
+                    <p style="margin: 0;">Strong Glass</p>
+                </div>
+                <div class="demo-item glass-effect-dark" style="color: white;">
+                    <p style="margin: 0;">Dark Glass</p>
+                </div>
+                <div class="demo-item blur-bg-light">
+                    <p style="margin: 0;">Blur Light</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hover Effects -->
+        <div class="showcase-section">
+            <h2 class="section-title">👆 Hover Effects</h2>
+            <div class="demo-grid">
+                <div class="demo-item scale-hover">
+                    <p style="margin: 0; cursor: pointer;">Scale Hover</p>
+                </div>
+                <div class="demo-item rotate-hover">
+                    <p style="margin: 0; cursor: pointer;">Rotate Hover</p>
+                </div>
+                <div class="demo-item skew-hover">
+                    <p style="margin: 0; cursor: pointer;">Skew Hover</p>
+                </div>
+                <div class="demo-item fade-color-hover" style="cursor: pointer;">
+                    <p style="margin: 0;">Color Fade</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Badges -->
+        <div class="showcase-section">
+            <h2 class="section-title">🏷️ Status Badges</h2>
+            <div style="padding: 20px; background: white; border-radius: 12px; display: flex; gap: 20px; flex-wrap: wrap;">
+                <span class="status-pill status-draft">Draft</span>
+                <span class="status-pill status-live">Live</span>
+                <span class="status-pill status-completed">Completed</span>
+                <span class="badge-animated" style="background: linear-gradient(135deg, #1565C0, #1A237E); color: white;">New</span>
+                <span class="badge-animated badge-pulse" style="background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white;">Popular</span>
+            </div>
+        </div>
+
+        <!-- Floating Elements -->
+        <div class="showcase-section">
+            <h2 class="section-title">🎈 Floating & Motion Effects</h2>
+            <div class="demo-grid">
+                <div class="animation-box gradient-primary floating">
+                    Floating
+                </div>
+                <div class="animation-box gradient-cool floating-slow">
+                    Floating Slow
+                </div>
+                <div class="animation-box gradient-warm floating-fast">
+                    Floating Fast
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Instructions -->
+        <div class="showcase-section">
+            <h2 class="section-title">📖 How to Use</h2>
+            <div class="panel-card">
+                <h3>Apply Classes to Your Elements:</h3>
+                <pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>&lt;!-- Fade In Animation --&gt;
+&lt;div class="fade-enter"&gt;Content&lt;/div&gt;
+
+&lt;!-- Gradient Background --&gt;
+&lt;div class="gradient-primary"&gt;Content&lt;/div&gt;
+
+&lt;!-- Glass Effect --&gt;
+&lt;div class="glass-effect"&gt;Content&lt;/div&gt;
+
+&lt;!-- Hover Lift Card --&gt;
+&lt;div class="panel-card hover-shadow-lift"&gt;Content&lt;/div&gt;
+
+&lt;!-- Floating Element --&gt;
+&lt;div class="animation-box gradient-cool floating"&gt;Content&lt;/div&gt;</code></pre>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 80px; padding: 40px 20px; background: white; border-radius: 12px; animation: slideInTop 0.6s ease-out;">
+            <p style="color: #666; margin: 0;">
+                ✨ Professional animations make your application feel modern and responsive
+            </p>
+            <p style="color: #999; font-size: 0.9rem; margin: 10px 0 0;">
+                All animations are optimized for performance and respect user preferences
+            </p>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/animations.js"></script>
+</body>
+</html>

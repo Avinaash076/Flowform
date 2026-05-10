@@ -1,0 +1,68 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+.env.production
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+*.code-workspace
+
+# Session Files
+storage/sessions/*
+!storage/sessions/.gitkeep
+
+# Logs
+storage/logs/*
+!storage/logs/.gitkeep
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Composer
+vendor/
+composer.lock
+
+# OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Database Backups
+*.sql
+*.db
+*.sqlite
+
+# PHP Storm
+.phpstorm.meta.php
+php.ini.dist
+
+# Node (if used)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build/Deployment
+build/
+dist/
+.env.production
+config/production.php
+
+# Custom Files
+SECURITY_CREDENTIALS.txt
+credentials.txt
+API_KEYS.txt
+*.pem
+*.key

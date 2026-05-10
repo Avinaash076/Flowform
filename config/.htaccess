@@ -1,0 +1,16 @@
+# Block direct access to config folder
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /flowform/config/
+    
+    # Block all direct access
+    RewriteRule ^(.*)$ - [F,L]
+</IfModule>
+
+# Disable PHP execution
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+# Additional security
+Options -Indexes

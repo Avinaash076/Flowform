@@ -1,0 +1,218 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    FLOWFORM - DEVELOPER QUICK REFERENCE                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 1. SESSION CHECK - ADD THIS ONE LINE TO ANY PROTECTED METHOD                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    public function dashboard() {
+        $this->checkAccess();              ← User must be logged in
+        // Safe zone - no need to check again
+    }
+    
+    public function admin_only() {
+        $this->checkAdminAccess();         ← Must be admin role
+    }
+    
+    public function employee_only() {
+        $this->checkEmployeeAccess();      ← Must be employee role
+    }
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 2. RENDERING VIEWS                                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    $this->set('key', $value);             ← Pass data to view
+    $this->render('viewname');             ← Renders app/views/{role}/viewname.php
+    $this->render('viewname', $data);      ← With data array
+    $this->render('viewname', $data, 'layout');  ← Custom layout
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 3. REDIRECTS                                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    $this->redirect('/dashboard');         ← Go to /flowform/dashboard
+    $this->redirectAfterLogin();           ← Redirect to originally requested page
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 4. FORMS - ALWAYS INCLUDE CSRF TOKEN                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" 
+               value="<?php echo generateCsrfToken(); ?>">
+        <input type="text" name="field" required>
+        <button type="submit">Submit</button>
+    </form>
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 5. FLASH MESSAGES - ONE-TIME NOTIFICATIONS                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    setFlashMessage('Success message', 'success');
+    setFlashMessage('Error occurred', 'error');
+    setFlashMessage('Warning', 'warning');
+    setFlashMessage('Info', 'info');
+    
+    Then redirect: $this->redirect('/page');
+    Message auto-displays once, then clears
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 6. AJAX REQUESTS - CSRF TOKEN AUTOMATICALLY ADDED                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    // Simple GET
+    ajaxRequest('/flowform/api?action=list', 'GET')
+        .then(response => showNotification('Success', 'success'))
+        .catch(error => showNotification('Error', 'error'));
+    
+    // POST with data (CSRF auto-included)
+    ajaxRequest('/flowform/api?action=save', 'POST', {name: 'John'})
+        .then(response => console.log(response));
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 7. JSON RESPONSES (API ENDPOINTS)                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    public function api() {
+        $this->checkAccess();
+        
+        $action = $_GET['action'] ?? null;
+        
+        if ($action === 'list') {
+            $data = $this->getList();
+            $this->jsonSuccess(['items' => $data]);
+        } else {
+            $this->jsonError('Invalid action', 400);
+        }
+    }
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 8. GETTING CURRENT USER INFO                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    getCurrentUserId()                     ← User ID from session
+    getUserRole()                          ← 'admin' or 'employee'
+    isLoggedIn()                           ← Boolean
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 9. URL MAPPING - HOW CLEAN URLS WORK                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    User Types: http://localhost/flowform/login
+                       ↓
+    .htaccess Rewrites to: http://localhost/flowform/index.php?route=login
+                       ↓
+    index.php Routes to: AuthController::login()
+                       ↓
+    URL Bar Still Shows: http://localhost/flowform/login ✓
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 10. ROUTE TABLE (ALL AVAILABLE ROUTES)                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    /login                  → AuthController::login()
+    /logout                 → AuthController::logout()
+    /register               → AuthController::register()
+    /dashboard              → AdminController::dashboard()
+    /employees              → AdminController::employees()
+    /forms                  → AdminController::forms()
+    /create-form            → FormController::create()
+    /fill-form              → EmployeeController::fillForm()
+    /employee-dashboard     → EmployeeController::dashboard()
+    /api?action=...         → FormController::api() [AJAX only]
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 11. SECURITY - WHAT'S PROTECTED                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ✓ Can't access /app/ directly                          → 403 Forbidden
+    ✓ Can't access /config/ directly                       → 403 Forbidden
+    ✓ Can't see .php extensions in URLs                    → Masking
+    ✓ Session expires after 30 min inactivity              → Auto-logout
+    ✓ Can't steal session via hijacking                    → IP check
+    ✓ Can't CSRF attack without token                      → Token check
+    ✓ Can't XSS inject without escaping                    → escapeHtml()
+    ✓ Can't frame in iframe                                → X-Frame-Options
+    ✓ Can't call API without AJAX header                   → Ajax check
+    ✓ Session regenerated after login                      → Fixation proof
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 12. SESSION TIMEOUT FLOW                                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    User Active:        $_SESSION['last_activity'] = time()  (every request)
+    
+    30 min inactivity:  isSessionExpired() returns true
+    
+    Next request:       Session destroyed, redirect to /login
+    
+    Message shown:      "Session expired, please login again"
+    
+    After login:        Redirect back to originally requested page
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 13. COMMON PATTERNS                                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Pattern: Check + Get + Set + Render
+    ─────────────────────────────────────
+    public function list() {
+        $this->checkAdminAccess();         // Check access
+        $items = $this->getItems();        // Get data
+        $this->set('items', $items);       // Pass to view
+        $this->render('list');             // Render view
+    }
+    
+    
+    Pattern: Form submission
+    ────────────────────────
+    public function save() {
+        $this->checkAccess();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verifyCsrfToken($_POST['csrf_token']) or die('Invalid token');
+            // Save data...
+            setFlashMessage('Saved!', 'success');
+            $this->redirect('/items');
+        }
+    }
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 14. HELPFUL JAVASCRIPT FUNCTIONS                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ajaxRequest(url, method, data)         ← AJAX with CSRF
+    showNotification(msg, type)            ← Show popup alert
+    confirmAction(msg)                     ← Yes/No confirmation
+    escapeHtml(text)                       ← Prevent XSS
+    keepSessionAlive()                     ← Ping server
+    showSessionExpiryWarning()              ← 5 min warning
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 15. TROUBLESHOOTING CHECKLIST                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ❌ Getting 404 on clean URLs?
+       → Check: mod_rewrite enabled? AllowOverride All set? Apache restarted?
+    
+    ❌ Can access /app/ folder?
+       → Check: mod_rewrite working? .htaccess in /app/ folder?
+    
+    ❌ Session expires too quickly?
+       → Check: SESSION_TIMEOUT in config/session.php set correctly?
+    
+    ❌ CSRF token errors?
+       → Check: Form includes csrf_token hidden input?
+    
+    ❌ Page shows error 403?
+       → Good! It means security is working (block direct access attempt)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          REMEMBER THE ONE-LINER!                            ║
+║                                                                              ║
+║          $this->checkAccess();        ← Protects any method!                 ║
+║          $this->checkAdminAccess();   ← Admin only!                          ║
+║          $this->checkEmployeeAccess(); ← Employee only!                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝

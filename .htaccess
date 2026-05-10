@@ -1,0 +1,32 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{THE_REQUEST} \s/+.+/index\.php[\s?] [NC]
+    RewriteRule ^index\.php$ ./ [R=302,L]
+
+    RewriteRule ^(?:app|config|vendor)(?:/|$) - [F,L,NC]
+
+    RewriteCond %{THE_REQUEST} \s/+.+\.php(?:[\s?]|$) [NC]
+    RewriteRule ^ - [F,L]
+
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+<FilesMatch "^(composer\.(json|lock)|README\.md|APACHE_SETUP\.txt|SETUP_COMPLETE\.txt|QUICK_REFERENCE\.txt|SECURITY_GUIDE\.php|EXAMPLE_CONTROLLER\.php)$">
+    Require all denied
+</FilesMatch>

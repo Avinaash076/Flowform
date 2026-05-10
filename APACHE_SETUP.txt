@@ -1,0 +1,253 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║           FLOWFORM - APACHE SETUP CHECKLIST FOR WINDOWS XAMPP                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Follow these steps to get FlowForm working on your Windows XAMPP installation.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: PLACE FILES IN HTDOCS                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Copy flowform/ folder to:
+    
+    C:\xampp\htdocs\flowform\
+    
+    After copying:
+    ✓ C:\xampp\htdocs\flowform\index.php exists
+    ✓ C:\xampp\htdocs\flowform\.htaccess exists
+    ✓ C:\xampp\htdocs\flowform\config\ exists
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: ENABLE MOD_REWRITE (CRITICAL!)                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    1. Open: C:\xampp\apache\conf\httpd.conf
+       (Use Notepad, Notepad++, or VS Code)
+    
+    2. Find line (around line 97):
+       #LoadModule rewrite_module modules/mod_rewrite.so
+    
+    3. Remove the # (uncomment):
+       LoadModule rewrite_module modules/mod_rewrite.so
+    
+    4. Save file
+    
+    ✓ Result: mod_rewrite is now enabled
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: SET ALLOWOVERRIDE (CRITICAL!)                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    1. In same httpd.conf file
+    
+    2. Find section (around line 241):
+       <Directory "C:/xampp/htdocs">
+           Options Indexes FollowSymLinks
+           AllowOverride None          ← CHANGE THIS
+           Require all granted
+       </Directory>
+    
+    3. Change "None" to "All":
+       AllowOverride All
+    
+    4. Save file
+    
+    ✓ Result: .htaccess files are now read by Apache
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: RESTART APACHE                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Method A: Using XAMPP Control Panel (Easy)
+    ───────────────────────────────────────────
+    1. Open XAMPP Control Panel
+    2. Click "Stop" next to Apache (if running)
+    3. Click "Start" to restart Apache
+    4. Status should show green/running
+    
+    Method B: Using Command Line (Windows Admin)
+    ─────────────────────────────────────────────
+    1. Open PowerShell as Administrator
+    2. Run: cd C:\xampp\apache\bin
+    3. Run: httpd.exe -t
+       Expected: Syntax OK
+    4. Restart Apache from Control Panel
+    
+    ✓ Result: Apache is running with new settings
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: TEST THE SETUP                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Test 1: Access the application
+    ──────────────────────────────
+    URL: http://localhost/flowform/login
+    
+    Expected: Login page displays
+    ✓ Clean URL with NO "index.php" visible
+    
+    
+    Test 2: Verify .htaccess is working
+    ─────────────────────────────────────
+    URL: http://localhost/flowform/index.php
+    
+    Expected: Still shows login page (rewrite is working)
+    
+    
+    Test 3: Verify app folder is blocked
+    ──────────────────────────────────────
+    URL: http://localhost/flowform/app/controllers/AuthController.php
+    
+    Expected: 403 Forbidden error ✓ (this is good!)
+    
+    
+    Test 4: Verify config folder is blocked
+    ────────────────────────────────────────
+    URL: http://localhost/flowform/config/session.php
+    
+    Expected: 403 Forbidden error ✓ (this is good!)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+❌ Problem: Getting 404 "Page not found" on /flowform/login
+───────────────────────────────────────────────────────────
+Solution:
+    1. Check mod_rewrite is enabled (Step 2)
+    2. Check AllowOverride is set to All (Step 3)
+    3. Check Apache is restarted (Step 4)
+    4. Try: http://localhost/flowform/index.php?route=login
+       If this works, .htaccess isn't being read
+       → Re-check AllowOverride setting
+
+❌ Problem: Still seeing "404" even with index.php
+──────────────────────────────────────────────────
+Solution:
+    1. Check if config/config.php exists
+    2. Check if app/controllers/BaseController.php exists
+    3. Check Apache error log: C:\xampp\apache\logs\error.log
+    4. Check httpd.conf syntax: httpd.exe -t
+    5. Try full URL: http://localhost/flowform/app/views/auth/login.php
+       If NOT blocked, .htaccess in /app/ isn't working
+
+❌ Problem: Getting 403 Forbidden even on /flowform/login
+──────────────────────────────────────────────────────────
+Solution:
+    1. Check file permissions (should be 644 for files)
+    2. Try disabling .htaccess temporarily:
+       Rename C:\xampp\htdocs\flowform\.htaccess to .htaccess.bak
+    3. If it works without .htaccess, there's a syntax error
+    4. Check Apache error log for details
+    5. Copy .htaccess from SECURITY_GUIDE.php
+
+❌ Problem: Can access /app/ folder directly (security issue!)
+───────────────────────────────────────────────────────────────
+Solution:
+    1. Verify C:\xampp\htdocs\flowform\app\.htaccess exists
+    2. Check its contents (should have RewriteRule block)
+    3. Check mod_rewrite is enabled
+    4. Check AllowOverride is All
+    5. Restart Apache
+
+❌ Problem: Browser shows "index.php" in URL
+──────────────────────────────────────────────
+Solution:
+    1. This means .htaccess rewrites aren't working
+    2. Check steps 2-3 again (mod_rewrite and AllowOverride)
+    3. Check Apache error log
+    4. Verify .htaccess is in C:\xampp\htdocs\flowform\
+
+❌ Problem: Session expires too quickly
+────────────────────────────────────────
+Solution:
+    1. Check SESSION_TIMEOUT in config/session.php
+    2. Verify it's set to: 30 * 60 (30 minutes)
+    3. Check Apache hasn't crashed/restarted
+    4. Try logging in again
+    5. Check PHP session settings in php.ini
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ VERIFY CONFIGURATION                                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Create test file: C:\xampp\htdocs\flowform\test.php
+
+    <?php
+    echo "PHP Version: " . PHP_VERSION . "<br>";
+    echo "mod_rewrite: " . (apache_mod_loaded('mod_rewrite') ? 'YES ✓' : 'NO ✗') . "<br>";
+    echo "AllowOverride: Check Apache config<br>";
+    phpinfo();
+    ?>
+
+Access: http://localhost/flowform/test.php
+
+Verify:
+    ✓ PHP version is 8.0 or higher
+    ✓ mod_rewrite shows "YES"
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ FIREWALL / ANTIVIRUS                                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+If you've done all steps and still getting errors:
+
+1. Check Windows Firewall isn't blocking Apache:
+   Windows Defender → Firewall & Network Protection → Allow apps through firewall
+   Ensure "Apache HTTP Server" is listed
+
+2. Check antivirus isn't blocking PHP execution:
+   Some antivirus flags PHP as suspicious
+   Try disabling temporarily for testing
+
+3. Check if port 80 is in use:
+   Run in PowerShell: netstat -ano | findstr :80
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ QUICK REFERENCE - IMPORTANT FILES                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    File                                        Purpose
+    ────────────────────────────────────────────────────────────────
+    C:\xampp\apache\conf\httpd.conf            Apache configuration
+    C:\xampp\htdocs\flowform\.htaccess         URL rewriting rules
+    C:\xampp\htdocs\flowform\index.php         Entry point
+    C:\xampp\htdocs\flowform\config\config.php App settings
+    C:\xampp\apache\logs\error.log             Apache errors (DEBUG)
+    C:\xampp\php\php.ini                       PHP configuration
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CHECKLIST - PRINT THIS AND CHECK OFF ITEMS                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    [ ] 1. Copied flowform/ to C:\xampp\htdocs\flowform\
+    [ ] 2. Opened C:\xampp\apache\conf\httpd.conf
+    [ ] 3. Uncommented: LoadModule rewrite_module modules/mod_rewrite.so
+    [ ] 4. Changed AllowOverride from None to All
+    [ ] 5. Saved httpd.conf
+    [ ] 6. Restarted Apache from XAMPP Control Panel
+    [ ] 7. Accessed http://localhost/flowform/login in browser
+    [ ] 8. Login page displays with clean URL ✓
+    [ ] 9. Tried http://localhost/flowform/app/controllers/AuthController.php
+    [ ] 10. Got 403 Forbidden (security working) ✓
+
+    All items checked? You're ready! 🎉
+    Access: http://localhost/flowform/login
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ NEED MORE HELP?                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1. Check SECURITY_GUIDE.php for detailed explanation
+2. Check README.md for overview
+3. Check QUICK_REFERENCE.txt for code patterns
+4. Review EXAMPLE_CONTROLLER.php for implementation patterns
+5. Check Apache error log: C:\xampp\apache\logs\error.log
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        YOU'RE ALL SET! 🚀                                    ║
+║                                                                              ║
+║              http://localhost/flowform/login                                ║
+║                                                                              ║
+║              Demo: admin@flowform.com / password123                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
