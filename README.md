@@ -1,394 +1,100 @@
-# 🎯 FlowForm - Secure PHP Form Management System
+# FlowForm — PHP MVC Form Management System
 
-A powerful, secure PHP MVC application for creating and managing dynamic forms with an intuitive drag-and-drop form builder, role-based access control, and enterprise-grade security.
-username-admin@flowform.com
-password-admin@123
-**Live Demo:** [flowform.free.nf](http://flowform.free.nf)
+A full-stack PHP application I built to manage dynamic forms with role-based access control, a drag-and-drop form builder, and a security-first architecture. Built without a framework to deepen my understanding of how routing, session management, and MVC structure work under the hood.
 
----
-
-## ✨ Key Features
-
-- 🔐 **Enterprise Security**: CSRF protection, session management, SQL injection prevention, URL masking
-- 🎨 **Visual Form Builder**: Drag-and-drop interface to create complex forms without coding
-- 👥 **Role-Based Access**: Admin, Manager, and Employee roles with granular permissions
-- 📊 **Form Submissions**: Track, filter, and analyze submitted form data
-- 🔄 **Form Sequences**: Create multi-step workflows and conditional logic
-- 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- 🚀 **MVC Architecture**: Clean separation of concerns with controllers, models, and views
-- ⚡ **AJAX Integration**: Smooth user experience with real-time updates
-- 🎭 **Session Management**: 30-minute timeout with IP and User-Agent verification
-- 📦 **Composer Support**: Easy dependency management with PHP autoloader
+**Live demo:** [flowform.free.nf](http://flowform.free.nf) — demo credentials available on request.
 
 ---
 
-## 🚀 Quick Start
+## What it does
 
-### Prerequisites
-- **PHP 8.0+** (Apache or Nginx with PHP-FPM)
-- **Apache with mod_rewrite enabled**
-- **MySQL/MariaDB** database
-- **Composer** for dependency management
-- **Git** for version control
-
-### Local Installation
-
-#### 1. Clone the Repository
-```bash
-git clone https://github.com/YOUR_USERNAME/flowform.git
-cd flowform
-```
-
-#### 2. Install Dependencies
-```bash
-composer install
-```
-
-#### 3. Set Up Environment Variables
-Create a `.env` file in the project root (see `.env.example`):
-```php
-DB_HOST=localhost
-DB_USER=flowform_user
-DB_PASSWORD=your_secure_password
-DB_NAME=flowform_db
-```
-
-#### 4. Configure Database
-```bash
-# Create database
-mysql -u root -p < database/schema.sql
-```
-
-#### 5. Set File Permissions
-```bash
-# Linux/Mac
-chmod 755 storage/sessions
-chmod 644 storage/sessions/*
-
-# Windows - Run as Administrator
-icacls "storage\sessions" /grant:r "%USERNAME%":F
-```
-
-#### 6. Configure Apache (Local Development)
-Edit `httpd.conf` and set:
-```apache
-LoadModule rewrite_module modules/mod_rewrite.so
-
-<Directory "C:/xampp/htdocs/flowform">
-    AllowOverride All
-</Directory>
-```
-
-#### 7. Access Application
-```
-http://localhost/flowform/login
-```
-
-**Default Login Credentials:**
-- Username: `admin`
-- Password: `password123`
+- Visual drag-and-drop form builder — create multi-field forms without writing HTML
+- Three-tier RBAC (Admin / Manager / Employee) with granular permission checks at the controller level
+- Multi-step form sequences with conditional logic
+- AJAX-powered submission tracking and analytics dashboard
+- Session management with 30-minute inactivity timeout, IP + User-Agent verification, and session fixation prevention
+- Full CSRF protection on all forms and AJAX requests
+- Clean URL routing through a single entry point (`index.php`) — no file paths exposed in the browser
 
 ---
 
-## 📁 Project Structure
+## Why I built it without a framework
+
+I deliberately avoided Laravel or Symfony for this project because I wanted to implement the MVC pattern, custom router, session handling, and security layer myself. Understanding what frameworks abstract away made me a significantly better developer when I did start working with them.
+
+---
+
+## Tech stack
+
+- **Backend:** PHP 8.0+, custom MVC architecture
+- **Database:** MySQL with prepared statements throughout (no raw query concatenation)
+- **Frontend:** HTML/CSS/JavaScript with AJAX for real-time updates
+- **Server:** Apache with mod_rewrite, `.htaccess` access control
+- **Auth:** Custom session-based authentication with role enforcement
+- **Tooling:** Composer for autoloading, Git for version control
+
+---
+
+## Project structure
 
 ```
 flowform/
-├── .htaccess                  # URL rewriting rules
-├── index.php                  # Single entry point (ONLY exposed file)
-├── .env.example               # Environment variables template
-├── composer.json              # Dependencies configuration
+├── index.php                  # Single entry point — only publicly accessible PHP file
+├── .htaccess                  # URL rewriting + blocks direct access to /app/ and /config/
+├── composer.json
 ├── config/
-│   ├── config.php             # Global constants & configuration
+│   ├── config.php             # Global constants
 │   ├── db.php                 # Database connection
-│   ├── session.php            # Session management
-│   └── mail.php               # Email configuration
+│   └── session.php            # Session configuration
 ├── app/
-│   ├── controllers/           # Request handlers
-│   │   ├── AuthController.php
-│   │   ├── AdminController.php
-│   │   ├── FormController.php
-│   │   └── ...
+│   ├── controllers/           # AuthController, AdminController, FormController, EmployeeController
 │   ├── models/                # Database models
-│   └── views/                 # HTML templates
+│   └── views/
+│       ├── layouts/           # Shared layout templates
 │       ├── auth/
 │       ├── admin/
-│       ├── employee/
-│       └── layouts/
+│       └── employee/
 ├── assets/
-│   ├── css/                   # Stylesheets
-│   ├── js/                    # JavaScript
-│   └── cursors/               # Custom cursors
-├── storage/
-│   └── sessions/              # Session files
-└── vendor/                    # Composer dependencies
+│   ├── css/
+│   └── js/
+└── storage/
+    └── sessions/              # File-based session storage
 ```
 
 ---
 
-## 🔒 Security Features
+## Security implementation
 
-### URL Masking & Routing
-All requests are routed through `index.php` - file paths are never exposed:
-```
-/flowform/login          → app/views/auth/login.php
-/flowform/dashboard      → app/views/admin/dashboard.php
-/flowform/forms          → app/views/admin/forms.php
-```
+This was the most deliberate part of the build. The checklist below is fully implemented, not aspirational:
 
-### CSRF Protection
-- Unique token generated per session
-- Automatic validation on all form submissions
-- Seamless AJAX integration with token headers
+- All requests route through `index.php` — direct access to `/app/` or `/config/` returns 403
+- CSRF token generated per session, validated on every POST/PUT/DELETE request and AJAX call
+- Session fixation prevention on login (session ID regenerated)
+- Session hijacking detection via IP address and User-Agent verification on every request
+- 30-minute inactivity timeout with redirect back to the originally requested URL after re-login
+- SQL injection prevention via PDO prepared statements on every query — zero raw interpolation
+- Security headers set on every response: `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`
+- `APP_DEBUG` flag in config — errors never surface to the user in production mode
 
-### Session Security
-- 30-minute inactivity timeout
-- IP address and User-Agent verification
-- Automatic login redirect on expiry
-- Session fixation attack prevention
-
-### Direct Access Prevention
-- `.htaccess` blocks direct access to `/app/` and `/config/`
-- All PHP files return 403 Forbidden if accessed directly
-- Only `index.php` is publicly accessible
-
-### Additional Security Headers
-```php
-X-Frame-Options: SAMEORIGIN          # Clickjacking protection
-X-Content-Type-Options: nosniff       # MIME sniffing prevention
-X-XSS-Protection: 1; mode=block       # XSS attack protection
-```
+The trickiest part was making CSRF work seamlessly with AJAX. The solution was attaching the token to a meta tag and reading it from a shared JS helper on every AJAX request, rather than embedding it per-form — which meant one consistent implementation path instead of manually adding it to every form and fetch call.
 
 ---
 
-## 👤 User Roles & Permissions
+## URL routing
 
-### Admin
-- Full system access
-- Create, edit, delete forms
-- Manage all form submissions
-- User and employee management
-- System configuration
+All browser URLs are clean — the actual file being executed is never visible:
 
-### Manager
-- Manage assigned forms
-- View submission analytics
-- Manage team employees
-- Limited user management
-
-### Employee
-- Fill and submit forms
-- View personal submissions
-- Access assigned forms only
-
----
-
-## 🛠️ API Endpoints
-
-### Authentication
-- `POST /api/login` - User login
-- `GET /api/logout` - User logout
-- `GET /api/user` - Get current user
-
-### Forms
-- `GET /api/forms` - List all forms
-- `POST /api/forms` - Create new form
-- `GET /api/forms/:id` - Get form details
-- `PUT /api/forms/:id` - Update form
-- `DELETE /api/forms/:id` - Delete form
-
-### Submissions
-- `GET /api/submissions` - List submissions
-- `POST /api/submissions` - Submit form
-- `GET /api/submissions/:id` - Get submission
-
----
-
-## 🎯 Usage Examples
-
-### Creating a Form Programmatically
-```php
-$formModel = new FormModel();
-$formId = $formModel->create([
-    'name' => 'Employee Feedback Form',
-    'description' => 'Monthly feedback collection',
-    'created_by' => 1,
-    'is_active' => true
-]);
+```
+GET /dashboard
+  → .htaccess rewrites to index.php?route=dashboard
+  → Router dispatches to AdminController::dashboard()
+  → Renders app/views/admin/dashboard.php within layouts/main.php
 ```
 
-### Adding Session Protection
-```php
-public function dashboard() {
-    $this->checkAccess();  // ← Verify user is logged in
-    
-    // Your code here
-    $data['title'] = 'Dashboard';
-    return $this->view('admin/dashboard', $data);
-}
-```
+Route map:
 
-### Verifying CSRF Token
-```php
-// Automatically handled in base controller
-if (!$this->verifyCsrfToken()) {
-    http_response_code(403);
-    die('CSRF token invalid');
-}
-```
-
----
-
-## 🌐 Environment Variables
-
-Create a `.env` file in the root directory:
-```php
-# Database
-DB_HOST=localhost
-DB_USER=flowform_user
-DB_PASSWORD=your_secure_password
-DB_NAME=flowform_db
-
-# Application
-APP_NAME=FlowForm
-APP_ENV=production
-APP_DEBUG=false
-
-# Email (Optional)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USER=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-
-# Session
-SESSION_TIMEOUT=1800
-SESSION_PATH=/storage/sessions
-```
-
----
-
-## 📚 Documentation
-
-- [SECURITY_GUIDE.php](SECURITY_GUIDE.php) - Complete security documentation
-- [ANIMATION_IMPLEMENTATION_SUMMARY.md](ANIMATION_IMPLEMENTATION_SUMMARY.md) - UI animations guide
-- [APACHE_SETUP.txt](APACHE_SETUP.txt) - Apache configuration instructions
-
----
-
-## 🐛 Troubleshooting
-
-### 404 Errors - URLs not routing
-- Ensure Apache `mod_rewrite` is enabled
-- Check `.htaccess` file exists in root
-- Verify `AllowOverride All` in Apache config
-
-### Database Connection Failed
-- Check MySQL is running
-- Verify `.env` database credentials
-- Ensure database user has proper permissions
-
-### Session Errors
-- Check `storage/sessions/` folder exists and is writable
-- Verify session timeout setting in `config/session.php`
-- Clear browser cookies and try again
-
-### Permission Denied Errors
-- Run `chmod 755 storage/sessions` (Linux/Mac)
-- Run as Administrator (Windows)
-- Check file ownership with `ls -la` (Linux)
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 💬 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Contact: support@flowform.free.nf
-- Live Site: [flowform.free.nf](http://flowform.free.nf)
-
----
-
-## 👨‍💻 Author
-
-Created with ❤️ by the FlowForm Team
-
-**Happy Form Building! 🎉**
-
-For role-based access:
-```php
-$this->checkAdminAccess();      // Admin only
-$this->checkEmployeeAccess();   // Employee only
-```
-
-## 🔐 Usage Examples
-
-### Create Protected Page
-```php
-class ReportsController extends BaseController {
-    public function view() {
-        $this->checkAdminAccess();  // Must be admin
-        
-        $data = $this->getReports();
-        $this->set('reports', $data);
-        $this->render('reports');  // Auto finds app/views/reports/view.php
-    }
-}
-```
-
-### Form with CSRF Protection
-```html
-<form method="POST" action="<?php echo APP_URL; ?>/save">
-    <input type="hidden" name="csrf_token" 
-           value="<?php echo generateCsrfToken(); ?>">
-    
-    <input type="text" name="title" required>
-    <button type="submit">Save</button>
-</form>
-```
-
-### AJAX Request
-```javascript
-// Automatically includes CSRF token
-ajaxRequest('/flowform/api?action=list', 'GET')
-    .then(response => console.log(response))
-    .catch(error => console.error(error));
-
-// Show notification
-showNotification('Form saved!', 'success');
-```
-
-### Flash Messages
-```php
-// In controller
-setFlashMessage('Profile updated successfully!', 'success');
-$this->redirect('/dashboard');
-
-// In view (auto-displays)
-<?php $msg = getFlashMessage(); ?>
-```
-
-## 🛣️ Route Mapping
-
-| Route | Controller | Action |
-|-------|-----------|--------|
+| URL | Controller | Method |
+|-----|-----------|--------|
 | /login | AuthController | login |
 | /logout | AuthController | logout |
 | /dashboard | AdminController | dashboard |
@@ -399,167 +105,85 @@ $this->redirect('/dashboard');
 | /employee-dashboard | EmployeeController | dashboard |
 | /api | FormController | api (AJAX only) |
 
-## 🔑 Core Functions
+---
 
-### Session Functions
+## Role-based access
+
+Three roles with permission checks enforced at the controller layer, not just the view layer:
+
+**Admin** — full system access, user management, form creation and deletion, submission analytics
+
+**Manager** — assigned forms only, submission analytics for their team, limited user management
+
+**Employee** — fill and submit assigned forms, view their own submission history
+
 ```php
-registerSession($userId, $userRole)     // Login user
-isLoggedIn()                             // Check login status
-isSessionExpired()                       // Check timeout
-getCurrentUserId()                       // Get user ID
-getUserRole()                            // Get user role
-logout()                                 // Logout user
+// Enforced at the start of every controller method that requires a role
+$this->checkAdminAccess();    // Redirects if not admin
+$this->checkEmployeeAccess(); // Redirects if not employee
 ```
-
-### CSRF Functions
-```php
-generateCsrfToken()                      // Get/create token
-verifyCsrfToken($token)                  // Verify token
-```
-
-### Message Functions
-```php
-setFlashMessage($msg, $type)             // Set one-time message
-getFlashMessage()                        // Get and clear message
-```
-
-### Controller Functions
-```php
-$this->render($view, $data, $layout)     // Render view
-$this->redirect($path)                   // Redirect
-$this->jsonResponse($data)               // JSON response
-$this->jsonError($message)               // JSON error
-```
-
-## 🌐 Browser URLs vs Actual Files
-
-When you visit URLs in your browser, the actual execution flow is:
-
-```
-User visits: http://localhost/flowform/dashboard
-
-↓
-
-.htaccess rewrites to: http://localhost/flowform/index.php?route=dashboard
-
-↓
-
-index.php routes to: AdminController::dashboard()
-
-↓
-
-AdminController calls: $this->render('dashboard')
-
-↓
-
-Renders view: app/views/admin/dashboard.php
-
-↓
-
-Within layout: app/views/layouts/main.php
-
-✓ User sees: http://localhost/flowform/dashboard (clean URL!)
-```
-
-## ⏱️ Session Timeout Flow
-
-```
-User logs in
-    ↓
-Session created: $_SESSION['last_activity'] = time()
-    ↓
-User active → $_SESSION['last_activity'] updated
-    ↓
-No activity for 30 minutes
-    ↓
-Next request: isSessionExpired() returns true
-    ↓
-Session destroyed
-    ↓
-Redirect to /login with message: "Session expired, please login again"
-    ↓
-After login → Redirect back to originally requested page
-```
-
-## 🔒 Security Checklist
-
-- ✓ URL masking (no file extensions visible)
-- ✓ No direct file access possible
-- ✓ Session timeout with auto-redirect
-- ✓ CSRF protection on all forms
-- ✓ Session fixation prevention
-- ✓ Session hijacking detection
-- ✓ XSS protection
-- ✓ MIME sniffing prevention
-- ✓ Clickjacking prevention
-- ✓ API AJAX-only enforcement
-
-## 🚨 Important Notes
-
-1. **Apache Configuration**
-   - mod_rewrite MUST be enabled
-   - AllowOverride MUST be set to All
-   - Restart Apache after changes
-
-2. **File Permissions**
-   - Keep `/config/` files outside web root in production
-   - Set appropriate permissions (644 for files, 755 for directories)
-
-3. **Error Handling**
-   - In production: Set `APP_DEBUG = false` in config.php
-   - Errors won't be displayed to users
-
-4. **HTTPS**
-   - For production: Enable HTTPS
-   - Add `Secure` flag to session cookies in session.php
-
-5. **Database**
-   - Use prepared statements for all queries
-   - Never concatenate user input into SQL queries
-
-## 📚 Documentation
-
-See `SECURITY_GUIDE.php` for:
-- Complete security implementation details
-- Advanced configuration options
-- Troubleshooting guide
-- Best practices
-
-## 🆘 Troubleshooting
-
-**Getting 404 errors on clean URLs?**
-- Ensure Apache mod_rewrite is enabled
-- Verify AllowOverride is set to All
-- Restart Apache
-
-**Can I access /app/controllers/file.php directly?**
-- No! .htaccess returns 403
-- If you can, mod_rewrite isn't working (see above)
-
-**Session expires randomly?**
-- Check SESSION_TIMEOUT in config/session.php (default: 30 minutes)
-- Verify Apache hasn't restarted (clears all sessions)
-
-**CSRF token errors?**
-- Ensure form includes: `<input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">`
-- All POST/PUT/DELETE forms require token
-
-## 📝 Demo Credentials
-
-```
-Admin Account:
-  Email: admin@flowform.com
-  Password: password123
-
-Employee Account:
-  Email: emp@flowform.com
-  Password: password123
-```
-
-## 🤝 Support
-
-For detailed implementation questions, refer to SECURITY_GUIDE.php or review controller examples in the codebase.
 
 ---
 
-**FlowForm** - Secure Form Management System | Built with PHP 8+ | Apache | MVC Pattern
+## Core session flow
+
+```
+Login
+ → Session created, last_activity = time(), ID regenerated (fixation prevention)
+ → Every request: IP + User-Agent verified, last_activity checked
+ → 30 min inactivity: session destroyed, redirect to /login
+ → After login: redirect back to originally requested URL
+```
+
+---
+
+## REST API endpoints
+
+```
+POST   /api/login           Auth
+GET    /api/logout          Auth
+GET    /api/user            Current user info
+
+GET    /api/forms           List forms
+POST   /api/forms           Create form
+GET    /api/forms/:id       Get form
+PUT    /api/forms/:id       Update form
+DELETE /api/forms/:id       Delete form
+
+GET    /api/submissions     List submissions
+POST   /api/submissions     Submit form
+GET    /api/submissions/:id Get submission
+```
+
+All API routes are AJAX-only — direct browser access returns an error response.
+
+---
+
+## Local setup
+
+```bash
+git clone https://github.com/Avinaash076/Flowform.git
+cd Flowform
+composer install
+cp .env.example .env
+# Edit .env with your DB credentials
+mysql -u root -p < database/schema.sql
+```
+
+Apache requirements: `mod_rewrite` enabled, `AllowOverride All` set for the project directory.
+
+```
+http://localhost/flowform/login
+```
+
+---
+
+## What I'd build differently now
+
+The custom router works but it's brittle — adding a new route means editing a central switch statement rather than declaring it declaratively. If I rebuilt this today I'd either use a micro-router package via Composer or migrate to Laravel, where route grouping and middleware registration are much cleaner. The permission system also lives in controller methods rather than a dedicated middleware layer, which creates some repetition I'd refactor out.
+
+---
+
+## Related projects
+
+- **oAuth-RBAC** — same RBAC concepts implemented inside Laravel using Eloquent, Blade, and Laravel middleware rather than custom PHP
