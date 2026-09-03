@@ -2,7 +2,7 @@
 
 A full-stack PHP application I built to manage dynamic forms with role-based access control, a drag-and-drop form builder, and a security-first architecture. Built without a framework to deepen my understanding of how routing, session management, and MVC structure work under the hood.
 
-**Live demo:** [flowform.free.nf](http://flowform.free.nf) — demo credentials available on request.
+
 
 ---
 
