@@ -1,189 +1,100 @@
 # FlowForm — PHP MVC Form Management System
 
-A full-stack PHP application I built to manage dynamic forms with role-based access control, a drag-and-drop form builder, and a security-first architecture. Built without a framework to deepen my understanding of how routing, session management, and MVC structure work under the hood.
-
-
+A full-stack PHP application for managing dynamic forms with role-based access control, a drag-and-drop form builder, and a security-first architecture. It features AI-powered form generation and custom workflows.
 
 ---
 
 ## What it does
 
-- Visual drag-and-drop form builder — create multi-field forms without writing HTML
-- Three-tier RBAC (Admin / Manager / Employee) with granular permission checks at the controller level
-- Multi-step form sequences with conditional logic
-- AJAX-powered submission tracking and analytics dashboard
-- Session management with 30-minute inactivity timeout, IP + User-Agent verification, and session fixation prevention
-- Full CSRF protection on all forms and AJAX requests
-- Clean URL routing through a single entry point (`index.php`) — no file paths exposed in the browser
+- **Visual Drag-and-Drop Form Builder**: Create multi-field forms without writing HTML.
+- **AI Form Generation**: Generate complete form layouts, fields, and styling via DeepSeek AI simply by describing the form and uploading an optional style reference image.
+- **Three-Tier RBAC**: Granular permission checks at the controller level for Admins, Managers, and Employees.
+- **Multi-step Sequences**: Create form workflows with conditional logic (e.g., Requested By, Approved By).
+- **Secure Architecture**: Session management with 30-minute inactivity timeout, IP + User-Agent verification, session fixation prevention, and full CSRF protection on all forms and AJAX requests.
+- **Clean URL Routing**: Routing through a single entry point (`index.php`), avoiding exposed file paths via `.htaccess` redirection.
 
 ---
 
-## Why I built it without a framework
-
-I deliberately avoided Laravel or Symfony for this project because I wanted to implement the MVC pattern, custom router, session handling, and security layer myself. Understanding what frameworks abstract away made me a significantly better developer when I did start working with them.
-
----
-
-## Tech stack
+## Tech Stack
 
 - **Backend:** PHP 8.0+, custom MVC architecture
-- **Database:** MySQL with prepared statements throughout (no raw query concatenation)
-- **Frontend:** HTML/CSS/JavaScript with AJAX for real-time updates
-- **Server:** Apache with mod_rewrite, `.htaccess` access control
-- **Auth:** Custom session-based authentication with role enforcement
-- **Tooling:** Composer for autoloading, Git for version control
+- **Database:** MySQL with PDO prepared statements
+- **Frontend:** HTML/CSS/JavaScript with AJAX
+- **AI Integration:** Puter.js (DeepSeek Chat)
+- **Server:** Apache with `mod_rewrite`, `.htaccess` access control
 
 ---
 
-## Project structure
+## Project Structure
 
 ```
 flowform/
-├── index.php                  # Single entry point — only publicly accessible PHP file
-├── .htaccess                  # URL rewriting + blocks direct access to /app/ and /config/
-├── composer.json
+├── index.php                  # Single entry point
+├── .htaccess                  # URL rewriting + access control
+├── composer.json              # Dependency management (autoloading)
 ├── config/
 │   ├── config.php             # Global constants
 │   ├── db.php                 # Database connection
 │   └── session.php            # Session configuration
 ├── app/
-│   ├── controllers/           # AuthController, AdminController, FormController, EmployeeController
+│   ├── controllers/           # Application controllers
 │   ├── models/                # Database models
-│   └── views/
-│       ├── layouts/           # Shared layout templates
-│       ├── auth/
-│       ├── admin/
-│       └── employee/
+│   └── views/                 # View templates
 ├── assets/
 │   ├── css/
-│   └── js/
+│   └── js/                    # Core JS and AI integration (ai-builder.js)
 └── storage/
     └── sessions/              # File-based session storage
 ```
 
 ---
 
-## Security implementation
+## Redirection & Security (`.htaccess`)
 
-This was the most deliberate part of the build. The checklist below is fully implemented, not aspirational:
+All incoming requests are handled by `.htaccess` which routes them through `index.php`. This ensures:
 
-- All requests route through `index.php` — direct access to `/app/` or `/config/` returns 403
-- CSRF token generated per session, validated on every POST/PUT/DELETE request and AJAX call
-- Session fixation prevention on login (session ID regenerated)
-- Session hijacking detection via IP address and User-Agent verification on every request
-- 30-minute inactivity timeout with redirect back to the originally requested URL after re-login
-- SQL injection prevention via PDO prepared statements on every query — zero raw interpolation
-- Security headers set on every response: `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`
-- `APP_DEBUG` flag in config — errors never surface to the user in production mode
+1.  **Clean URLs**: Requests like `/dashboard` are rewritten to `index.php?route=dashboard`.
+2.  **Protected Directories**: Direct access to `/app`, `/config`, and `/vendor` returns a 403 Forbidden.
+3.  **Security Headers**: Adds standard security headers such as `X-Frame-Options` and `X-Content-Type-Options`.
 
-The trickiest part was making CSRF work seamlessly with AJAX. The solution was attaching the token to a meta tag and reading it from a shared JS helper on every AJAX request, rather than embedding it per-form — which meant one consistent implementation path instead of manually adding it to every form and fetch call.
+### URL Routing Map
 
----
-
-## URL routing
-
-All browser URLs are clean — the actual file being executed is never visible:
-
-```
-GET /dashboard
-  → .htaccess rewrites to index.php?route=dashboard
-  → Router dispatches to AdminController::dashboard()
-  → Renders app/views/admin/dashboard.php within layouts/main.php
-```
-
-Route map:
-
-| URL | Controller | Method |
-|-----|-----------|--------|
-| /login | AuthController | login |
-| /logout | AuthController | logout |
-| /dashboard | AdminController | dashboard |
-| /employees | AdminController | employees |
-| /forms | AdminController | forms |
-| /create-form | FormController | create |
-| /fill-form | EmployeeController | fillForm |
-| /employee-dashboard | EmployeeController | dashboard |
-| /api | FormController | api (AJAX only) |
+| URL | Controller | Method | Role |
+|-----|-----------|--------|------|
+| /login | AuthController | login | Public |
+| /dashboard | AdminController | dashboard | Admin/Manager |
+| /forms/builder | FormController | builder | Admin |
+| /employee-dashboard | EmployeeController | dashboard | Employee |
+| /api/* | Various | API Endpoints | Varies (AJAX only) |
 
 ---
 
-## Role-based access
+## Setup & Deployment Instructions
 
-Three roles with permission checks enforced at the controller layer, not just the view layer:
+### Prerequisites
 
-**Admin** — full system access, user management, form creation and deletion, submission analytics
+- PHP 8.0 or higher
+- MySQL Database
+- Apache web server with `mod_rewrite` enabled and `AllowOverride All` configured.
 
-**Manager** — assigned forms only, submission analytics for their team, limited user management
+### Local Development
 
-**Employee** — fill and submit assigned forms, view their own submission history
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/Avinaash076/Flowform.git
+    cd Flowform
+    ```
+2.  **Install dependencies**:
+    ```bash
+    composer install
+    ```
+3.  **Configuration**:
+    Copy the example `.env` file or configure your database settings directly in `config/config.php` (if using constants).
+4.  **Database Setup**:
+    Import the database schema into your MySQL instance (e.g., `mysql -u root -p flowform < database/schema.sql`).
+5.  **Access the application**:
+    Navigate to `http://localhost/flowform` (or your configured virtual host).
 
-```php
-// Enforced at the start of every controller method that requires a role
-$this->checkAdminAccess();    // Redirects if not admin
-$this->checkEmployeeAccess(); // Redirects if not employee
-```
+### Production Deployment
 
----
-
-## Core session flow
-
-```
-Login
- → Session created, last_activity = time(), ID regenerated (fixation prevention)
- → Every request: IP + User-Agent verified, last_activity checked
- → 30 min inactivity: session destroyed, redirect to /login
- → After login: redirect back to originally requested URL
-```
-
----
-
-## REST API endpoints
-
-```
-POST   /api/login           Auth
-GET    /api/logout          Auth
-GET    /api/user            Current user info
-
-GET    /api/forms           List forms
-POST   /api/forms           Create form
-GET    /api/forms/:id       Get form
-PUT    /api/forms/:id       Update form
-DELETE /api/forms/:id       Delete form
-
-GET    /api/submissions     List submissions
-POST   /api/submissions     Submit form
-GET    /api/submissions/:id Get submission
-```
-
-All API routes are AJAX-only — direct browser access returns an error response.
-
----
-
-## Local setup
-
-```bash
-git clone https://github.com/Avinaash076/Flowform.git
-cd Flowform
-composer install
-cp .env.example .env
-# Edit .env with your DB credentials
-mysql -u root -p < database/schema.sql
-```
-
-Apache requirements: `mod_rewrite` enabled, `AllowOverride All` set for the project directory.
-
-```
-http://localhost/flowform/login
-```
-
----
-
-## What I'd build differently now
-
-The custom router works but it's brittle — adding a new route means editing a central switch statement rather than declaring it declaratively. If I rebuilt this today I'd either use a micro-router package via Composer or migrate to Laravel, where route grouping and middleware registration are much cleaner. The permission system also lives in controller methods rather than a dedicated middleware layer, which creates some repetition I'd refactor out.
-
----
-
-## Related projects
-
-- **oAuth-RBAC** — same RBAC concepts implemented inside Laravel using Eloquent, Blade, and Laravel middleware rather than custom PHP
+When deploying to a shared host (like InfinityFree), simply upload the contents of the repository to your `htdocs` or `public_html` directory. The `.htaccess` file handles URL routing. Ensure the host allows `.htaccess` overrides.

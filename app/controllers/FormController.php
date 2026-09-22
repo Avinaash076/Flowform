@@ -45,8 +45,8 @@ class FormController extends BaseController
             'title' => 'Form Builder',
             'employees' => $this->userModel->getEmployees(),
             'builderData' => $builderData,
-            'extraHead' => '<script src="https://js.puter.com/v2/"></script>',
-            'pageScripts' => [asset_url('js/ai-chat.js')],
+            'extraHead' => '<script src="https://js.puter.com/v2/"></script><script>window.puter = window.puter || {}; window.puter.quiet = true;</script>',
+            'pageScripts' => [asset_url('js/ai-builder.js')],
         ]);
     }
 
