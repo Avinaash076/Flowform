@@ -57,7 +57,7 @@ function parseAiJson(rawText) {
     }
 }
 
-async function sendToAI() {
+window.sendToAI = async function sendToAI() {
     const input = document.getElementById('ai-input');
     if (!input) {
         return;
