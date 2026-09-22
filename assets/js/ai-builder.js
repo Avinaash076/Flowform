@@ -63,15 +63,13 @@ window.sendToAI = async function sendToAI() {
         return;
     }
 
-    const styleImage = document.getElementById('theme-style-image');
-    const styleFile = styleImage && styleImage.files && styleImage.files[0] ? styleImage.files[0] : null;
     const prompt = input.value.trim();
     if (!prompt) {
         appendAiMessage('Describe the form first so the builder has something to generate.', 'ai-bubble-error');
         return;
     }
 
-    appendAiMessage(styleFile ? `${prompt}\n\nStyle image: ${styleFile.name}` : prompt, 'ai-bubble-user');
+    appendAiMessage(prompt, 'ai-bubble-user');
     input.value = '';
 
     const pendingBubble = appendAiMessage('Generating fields and theme suggestions...', 'ai-bubble');
@@ -91,9 +89,7 @@ window.sendToAI = async function sendToAI() {
             { role: 'system', content: FLOWFORM_AI_SYSTEM_PROMPT },
             {
                 role: 'user',
-                content: styleFile
-                    ? `${prompt}\n\nAvailable employees:\n${employeeContext}\n\nA style reference image named "${styleFile.name}" will be attached to the form. Suggest matching colors, border radius, and font choices based on a clean internal business form style.`
-                    : `${prompt}\n\nAvailable employees:\n${employeeContext}`,
+                content: `${prompt}\n\nAvailable employees:\n${employeeContext}`,
             },
         ], {
             model: FLOWFORM_AI_MODEL,
