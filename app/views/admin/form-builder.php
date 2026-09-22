@@ -83,14 +83,6 @@ $employeesJson = json_encode($employees, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED
             </div>
         </div>
         <div class="ai-input-area">
-            <label class="ai-file-upload">
-                <span>Style image</span>
-                <input type="file" name="style_image" id="theme-style-image" accept="image/png,image/jpeg,image/webp,image/gif">
-            </label>
-            <div class="ai-style-preview" id="ai-style-preview" hidden>
-                <img src="" alt="Selected style reference">
-                <small></small>
-            </div>
             <textarea id="ai-input" placeholder="Describe your form..."></textarea>
             <button type="button" onclick="sendToAI()">Generate</button>
         </div>
